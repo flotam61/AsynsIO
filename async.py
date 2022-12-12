@@ -32,15 +32,37 @@ class People(Base):
     id = Column(Integer, primary_key=True)
     json = Column(JSON)
 
-
 async def get_person(people_id: int, session: ClientSession):
     async with session.get(f'https://swapi.dev/api/people/{people_id}') as response:
         json_data = await response.json()
+        films_list = []
+        for i in json_data['films']:
+            async with session.get(f'{i}') as film_data:
+                y = await film_data.json()
+                films_list.append(y['title'])
+        speciec_list = []
+        for i in json_data['species']:
+            async with session.get(f'{i}') as speciec_data:
+                y = await speciec_data.json()
+                speciec_list.append(y['name'])
+        starships_list = []
+        for i in json_data['starships']:
+            async with session.get(f'{i}') as starships_data:
+                y = await starships_data.json()
+                starships_list.append(y['name'])
+        vehicles_list = []
+        for i in json_data['vehicles']:
+            async with session.get(f'{i}') as vehicles_data:
+                y = await vehicles_data.json()
+                vehicles_list.append(y['name'])
+    new_data = {'films': films_list, 'species': speciec_list, 'starships': starships_list, 'vehicles': vehicles_list}
+    json_data.update(new_data)
+
     return json_data
 
 async def get_people():
     async with ClientSession() as session:
-        for chunk in chunked(range(1, 84), chunk_cize):
+        for chunk in chunked(range(1, 6), chunk_cize):
             coroutines = [get_person(people_id=i, session=session) for i in chunk]
             results = await asyncio.gather(*coroutines)
             for item in results:
