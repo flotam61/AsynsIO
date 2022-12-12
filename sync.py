@@ -31,13 +31,18 @@ def get_people(people_id):
 
 
     data = requests.get(f'https://swapi.dev/api/people/{people_id}').json()
-    data_new = get_list_in_url(data)
-    print(data_new)
-    return data_new
+    print(data)
+    if 'detail' not in data:
+        print('net')
+    else:
+        print('da')
+    # data_new = get_list_in_url(data)
+    # print(data_new)
+    return data
 
 
 def main():
-    for i in range(1, 6):
+    for i in range(17, 19):
         get_people(i)
 
 start = datetime.datetime.now()
